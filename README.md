@@ -1,2 +1,2 @@
-# essenza.react
-React implementation of Essenza Model
+# vista.react
+React implementation of Vista
