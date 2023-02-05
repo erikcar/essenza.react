@@ -1,4 +1,4 @@
-import { useContext, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { VistaContext } from "../components/Vista";
 import { useApp } from "../core/AppContext";
 import { Context, EntityModel, VistaApp } from "@essenza/core";
@@ -10,28 +10,38 @@ import { Context, EntityModel, VistaApp } from "@essenza/core";
  * @returns {[Controller]}
  */
 export function useControl(controller, ctx) { //Add useModelContext()
-
     const context = useContext(VistaContext) || ctx || VistaApp.context;
-
     console.log("USE MODEL", context, controller);
     const c = context.getControl(controller);
-    
     return [c];//[m, source];
 }
 
-export function useModel(vid){
-    const model = useRef(new EntityModel(vid));
-    return [model.current];
+export function useModel(skin, controller, vid, ctx){
+    const model = useRef(new EntityModel(vid)).current;
+    const context = useContext(VistaContext) || ctx || VistaApp.context;
+
+    useEffect(()=>{
+        context.register(skin, model);
+        return () => context.unregister(skin, model);
+    },[context]);
+
+    model.control = context.controls.get(skin);
+
+    if(!model.control){
+        model.control = context.setController(skin, controller, true);
+    }
+
+    return [model, model.control];
 }
 
-export function useVista(controller, contextName) {
+export function useVista(skin, controller, contextName) {
     //ContextName ?
     const context = useRef(new Context(contextName || controller.name));
-    const [c] = useControl(controller, context.current); 
+    const [m, c] = useModel(skin, controller, null, context.current); 
     /*const [m] = useModel();
     c.model = m;*/
     console.log("USE VISTA:", c);
-    return [context.current, c, c.model];
+    return [context.current, m, c];
 }
 
 export function useBreakPoint(size){

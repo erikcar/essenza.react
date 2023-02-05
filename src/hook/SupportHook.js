@@ -1,6 +1,6 @@
 import { Form } from "antd";
-import { useEffect, useRef } from "react";
-import { DataSource, Observable } from "@essenza/core";
+import { useEffect, useMemo, useRef } from "react";
+import { DataSource, Observable, EntityModel } from "@essenza/core";
 
 const mutation = function (mutated, state, model) {
   const node = state.node;
@@ -19,25 +19,36 @@ const mutation = function (mutated, state, model) {
  * @returns 
  */
 export const useForm = (name, source, control, formatter, schema) => {
+  let model;
+  if (control instanceof EntityModel) {
+    model = control;
+    control = model.control;
+  }
   source = source || new DataSource({});
   const [target] = Form.useForm();
-  if(target && schema){
-    target.schema = schema;
-    target.vdata = {};
-  }
-  const ref = useRef(new ObservableForm(target, source?.data, schema, formatter));
-  const form = ref.current;
 
-  form.name = name;
-  form.target = target;
-  form.control = control;
-  form.source = source;
+  const form = useMemo(() => {
+    const _form = new ObservableForm(target, source?.data, schema, formatter);
+    if (target && schema) {
+      target.schema = schema;
+      target.vdata = {};
+    }
 
-  //Conviene registrare tutto in context di app?
-  control.context.registerElement(name, form); //Controllare se ne esiste uno già registrato => worning or error
+    _form.name = name;
+    _form.target = target;
+    _form.control = control;
+    _form.source = source;
+
+    control.context.registerElement(name, _form);
+
+    if (model) {
+      if(!model.form) model.form = {};
+      model.form[name] = _form;
+    }
+    return _form;
+  }, [])
 
   useEffect(() => {
-    const form = ref.current;
     console.log("DEBUG USE FORM RESET", source, form);
     if (!source || !source.data || (form.source?.data && form.source.data.id !== source.data.id))
       form.target.resetFields();
@@ -45,8 +56,7 @@ export const useForm = (name, source, control, formatter, schema) => {
   }, [source]);
 
   useEffect(() => {
-    const form = ref.current;
-    control.Subscribe("OBSERVABLE", form.observable.onPublish.bind(form.observable));
+    form.control = control;
   }, [control]);
 
   return form;
@@ -63,7 +73,7 @@ export function ObservableForm(form, data, schema, formatter) {
   Object.defineProperty(this, "data", {
     get() { return this.source ? this.source.data : undefined; },
   });
-  
+
   this.observe = function (fields, emitters) {
     return this.observable.observe(fields, emitters);
   }
@@ -78,7 +88,7 @@ export function ObservableForm(form, data, schema, formatter) {
         this.mutateValues();
         this.checked = true;
         //form.resetFields();
-        return { isValid: true, data: this.source.data, node: this.source.node, form: form, values: form.getFieldsValue(true)};
+        return { isValid: true, data: this.source.data, node: this.source.node, form: form, values: form.getFieldsValue(true) };
       })
       .catch(errorInfo => {
         console.log("DEBUG VALIDATOR ERROR", errorInfo); //Si può fare publish di error che da app viene ascoltatato e riportato a user in modo cetntralizzato
@@ -86,12 +96,12 @@ export function ObservableForm(form, data, schema, formatter) {
       });
   };
 
-  this.setValue = function(field, value){
+  this.setValue = function (field, value) {
     console.log("SET VALUE", this.target);
     const obj = {};
     obj[field] = value;
     this.target.setFieldsValue(obj);
-    
+
     this.valueChanged(field, value);
   }
 
@@ -185,10 +195,10 @@ export function ObservableForm(form, data, schema, formatter) {
   }
 }
 
-export const usePrinter = ()=>{
+export const usePrinter = () => {
   const printer = useRef({});
   return printer.current;
-} 
+}
 
 /*export const useForm = (name, source, model) =>{
   const [form] = Form.useForm();

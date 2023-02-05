@@ -33,7 +33,7 @@ export function PopUp(){
     //Più corretto Messanger in ascolto su messagio e aggiorna stato
     //const [isModalVisible, setIsModalVisible] = useState(false);
     const {data} = useGraph(SystemModel, "modal");
-    const[model] = useModel(PopUp);
+    //const[model] = useModel(PopUp);
  
     console.log("POPUP", data);
     let isModalVisible = false;

@@ -6,8 +6,6 @@ import { VistaJS } from "./Vista";
 
 const { Item } = Form;
 export function Formix({ control, form, instance, initialValues, observe, children, ...rest }) {
-    //const [target] = Form.useForm();
-    //form.target= target;
     console.log("FORMIX DEBUG", control, form, rest);
     if (VistaJS.DEVELOPMENT) {
         if (!control || !form)
@@ -26,7 +24,6 @@ export function Formix({ control, form, instance, initialValues, observe, childr
             field = e.target.parentNode.parentNode.parentNode.id;
         if(form.valueChanged(field)){
             const values = form.target.getFieldsValue(true);
-            //control.publish("OBSERVABLE", "onblur", { field: e.target.id, value: values[e.target.id], values: values });
             form.observable.onPublish("onblur", { field: e.target.id, value: values[e.target.id], values: values });
         }
     };
@@ -34,34 +31,20 @@ export function Formix({ control, form, instance, initialValues, observe, childr
     const onselect = (e) => {
         console.log("PASSA SELECT", e.detail); //e.target.id, form.target.getFieldsValue(e.target.id), e.target);
         const values = form.target.getFieldsValue(true);
-        //form.data[e.detail.field + '_label'] = e.detail.item.label;
-        //control.publish("OBSERVABLE", "onselect", { field: e.detail.field, value: values[e.detail.field], values: values, data: e.detail.item });
         form.observable.onPublish("onselect", { field: e.detail.field, value: values[e.detail.field], values: values, data: e.detail.item });
     };
 
     const onfocus = (e) =>{
-        //console.log("FORMIX ON FOCUS", e);
-        //return;
         if(!ref.current){
             ref.current = e.target.form;
             if (observe && observe.indexOf(',select,') > -1)
                 ref.current.addEventListener('oselect', onselect);
         }
-        //e.target.form.removeEventListener("focus", onfocus);
-
     }
 
- /*    useEffect(()=>{
-        //if (observe && observe.indexOf(',select,') > -1)
-            //ref.current.addEventListener('onselect', (e) => console.log(e.item));
-        //return () => ref.current && ref.current.removeEventListener("onselect");
-    },[]) */
-
     const props = {...{ ...rest, form: form.target, initialValues: form.format(initialValues), onFocus: onfocus, onLoad: (e) => console.log("onselect", e) } };
-    //,  initialValues: form.__source__
-    props.onBlur = blur; //Per ora faccio sempre check
 
-    //props.onValuesChange = valueChange;
+    props.onBlur = blur; //Per ora faccio sempre check
 
     if (observe) {
         observe = ',' + observe + ',';
@@ -70,30 +53,11 @@ export function Formix({ control, form, instance, initialValues, observe, childr
 
         if (observe.indexOf(',change,') > -1)
             props.onValuesChange = valueChange;
-
-            //form.target.addEven
-        //if (observe.indexOf(',select,') > -1)
-            //ref.current.addEventListener('onselect', (e) => console.log(e.item));//props.onSelect = onselect;
-
     }
-    console.log("VALIDATOR IS FORM schema", form.schema, Form.useForm());
-    /*const fc = React.createElement(Form, props, ...children); 
-    let component;
-    if (form.schema)
-        component = <Validator schema={form.schema} >{fc}</Validator>;
-    else
-        component = fc;*/
+
     return <Form {...props}>
         {children}
-   {/*  {React.Children.map(children, (child) => {
-      console.log(child);
 
-      return React.createElement(child.type, {
-            ...{
-              ...child.props,
-            },
-          })
-    })} */}
   </Form>;
 }
 
@@ -103,58 +67,3 @@ export function FormixItem({children, ...props}){
         props = {...props, rules: [({ getFieldValue }) => ({validator(_, value) { form.vdata[props.name] = value; return form.schema.validateAt(props.name, form.vdata);},}),]}
     return React.createElement(Form.Item, props, children);
 }
-
-/*export function FormWrap(props){
-    return React.createElement(Form, props);
-}*/
-/*function ItemContainer({ children, last, remove, add, key }) {
-    const [visible, setVisible] = useState(false);
-    const minus = <CloseOutlined style={{ fontSize: '14px', color: '#aaa', visibility: visible ? 'visible' : 'hidden' }} onClick={() => remove()} />;
-    const actions = last
-        ? <>{minus}<PlusCircleOutlined onClick={() => add()} /></>
-        : minus;
-    return (<div key={key} onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)}>{children} {actions}</div>)
-}
-
-export function ItemRenderer({ name, children, value }) {
-    return <Form.List name={name || 'items'} initialValue={value}>
-        {(fields, { add, remove }) => (
-            <>
-                {fields.map(({ key, name, ...restField }, index) => {
-                    console.log("ItemRender", key, name, fields);
-
-                    //
-
-                    return (<ItemContainer last={key === fields.length - 1} add={add} remove={remove} key={index}>{children(name, restField)}</ItemContainer>)
-                }
-                )}
-            </>
-        )}
-    </Form.List>
-}
-
-export function ItemRendererTest() {
-    const data = useRef({ name: "Name", surname: "Surname", emails: [{ value: "a@a.it", label: "Personal" }, { value: "b@b.it", label: "Work" }], address: "placve" });
-    return (
-        <Form initialValues={data.current}>
-            <Form.Item name="name">
-                <Input />
-            </Form.Item>
-            <Form.Item name="surname">
-                <Input />
-            </Form.Item>
-            <ItemRenderer name="emails" >
-                {
-                    (name, info) => (
-                        <Space >
-                            <Form.Item {...info} name={["0", 'value']}>
-                                <Input />
-                            </Form.Item>
-                            <Form.Item {...info} name={[name, 'label']}>
-                                <Input />
-                            </Form.Item>
-                        </Space>)
-                }
-            </ItemRenderer>
-        </Form>);
-}*/
