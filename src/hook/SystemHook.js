@@ -20,6 +20,8 @@ export function useModel(skin, controller, vid, ctx){
     const model = useRef(new EntityModel(vid)).current;
     const context = useContext(VistaContext) || ctx || VistaApp.context;
 
+    [model.state.__val, model.state.__refresh] = useState(false);
+
     useEffect(()=>{
         context.register(skin, model);
         return () => context.unregister(skin, model);
@@ -31,17 +33,17 @@ export function useModel(skin, controller, vid, ctx){
         model.control = context.setController(skin, controller, true);
     }
 
-    return [model, model.control];
+    return [model, model.control, model.state];
 }
 
 export function useVista(skin, controller, contextName) {
     //ContextName ?
     const context = useRef(new Context(contextName || controller.name));
-    const [m, c] = useModel(skin, controller, null, context.current); 
+    const [m, c, s] = useModel(skin, controller, null, context.current); 
     /*const [m] = useModel();
     c.model = m;*/
     console.log("USE VISTA:", c);
-    return [context.current, m, c];
+    return [context.current, m, c, s];
 }
 
 export function useBreakPoint(size){

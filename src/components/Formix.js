@@ -5,7 +5,7 @@ import {Validator} from "./Validator";
 import { VistaJS } from "./Vista";
 
 const { Item } = Form;
-export function Formix({ control, form, instance, initialValues, observe, children, ...rest }) {
+export function Formix({ control, form, instance, initialValues, observe, children, disabled, ...rest }) {
     console.log("FORMIX DEBUG", control, form, rest);
     if (VistaJS.DEVELOPMENT) {
         if (!control || !form)
@@ -42,7 +42,7 @@ export function Formix({ control, form, instance, initialValues, observe, childr
         }
     }
 
-    const props = {...{ ...rest, form: form.target, initialValues: form.format(initialValues), onFocus: onfocus, onLoad: (e) => console.log("onselect", e) } };
+    const props = { ...rest, form: form.target, initialValues: form.format(initialValues), onFocus: onfocus, onLoad: (e) => console.log("onselect", e), disabled: disabled } ;
 
     props.onBlur = blur; //Per ora faccio sempre check
 
