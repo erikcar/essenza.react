@@ -8,7 +8,7 @@ const { Item } = Form;
 export function Formix({ control, form, instance, initialValues, observe, children, disabled, ...rest }) {
     console.log("FORMIX DEBUG", control, form, rest);
     if (VistaJS.DEVELOPMENT) {
-        if (!control || !form)
+        if (!form)
             throw new Error("Formix must have model and form instance.");
     }
     

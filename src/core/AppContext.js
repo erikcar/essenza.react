@@ -83,12 +83,16 @@ export const AppRoot = ({ init, onload, schema, onlogin, baseurl, control, child
     }
 
     useEffect(() => {
+        VistaApp.current = app;
+    }, [app]);
+    
+    useEffect(() => {
         oninit.current(); 
         if(VistaApp.irequest && VistaApp.irequest.type === "LOG"){
-            let session = sessionStorage.getItem("_session");
+            let session = localStorage.getItem("_session");
             console.log("SESSION-LOGIN", session);
             if(session){
-                sessionStorage.removeItem("_session");
+                localStorage.removeItem("_session");
                 VistaApp.login(JSON.parse(session));
             }
         }
@@ -96,9 +100,7 @@ export const AppRoot = ({ init, onload, schema, onlogin, baseurl, control, child
             VistaApp.onlogin(VistaApp);*/
     }, []);
 
-    useEffect(() => {
-        VistaApp.current = app;
-    }, [app]);
+    
 
     return (
         <AppContext.Provider value={app} >

@@ -1,6 +1,6 @@
 import { Form } from "antd";
-import { useEffect, useMemo, useRef } from "react";
-import { DataSource, Observable, EntityModel } from "@essenza/core";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { DataSource, Observable, EntityModel, syncle } from "@essenza/core";
 
 const mutation = function (mutated, state, model) {
   const node = state.node;
@@ -8,6 +8,29 @@ const mutation = function (mutated, state, model) {
   for (const key in mutated) {
     node.mutate(key, mutated[key], data);
   }
+}
+
+export const useSyncle = () =>{
+
+  const [result, setResult] = useState(syncle.result);
+
+  useEffect(()=>{
+    syncle.subscribe(setResult);
+    return () => syncle.unscribe(setResult);
+  }, [setResult])
+
+  return result;
+}
+
+export const usePolling = (fnc) =>{
+  const poller = useRef(syncle.poll(fnc));
+
+  useEffect(()=>{
+    //syncle.subscribe(poller.current);
+    return () => syncle.unpoll(poller.current);
+  }, [poller.current])
+
+  return poller.current;
 }
 
 /**
@@ -218,3 +241,4 @@ export const usePrinter = () => {
 
   return form;
 }*/
+
