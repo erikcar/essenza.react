@@ -12,9 +12,16 @@ function Controller(c) {
 //file.type === 'image/jpeg' || file.type === 'image/png' || file.type === "application/pdf"
 const MimeTypes = {png: "image/png", jpg: "image/jpeg", pdf: "application/pdf"}
 
-export function Uploader({ data, url, onSuccess, onChange, restrictTo, fileList, children, ...rest }) {
+export function Uploader({ data, url, onSuccess, onChange, restrictTo, fileList, thumbUrl, children, ...rest }) {
     const [control] = useControl(Controller);
-    const [files, setFiles] = useState(fileList);
+    const [files, setFiles] = useState(() => {
+        if(fileList && fileList.length>0){
+            fileList.forEach((file)=>{
+                if(file.ext === '.pdf') file.thumbUrl = thumbUrl || '/icon/pdf.svg';
+            })
+        }
+        return fileList
+    });
 
     if (!url) {
         throw new Error("Uploader must define Url to upload.")

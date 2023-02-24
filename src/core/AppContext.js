@@ -23,20 +23,20 @@ export const AppRoot = ({ init, onload, schema, onlogin, baseurl, control, child
         //return Vist
     });
     console.log("APP PROVIDER STATE", app, VistaApp);
-    if(qp){
-        if(qp.has("fareq"))
-            app.irequest = {type: 'FA', data: qp};
-        else if(qp.has("emreq"))
-            app.irequest = {type: 'EM', data: qp};
-        else if(qp.has("loginreq"))
-            app.irequest = {type: 'LOG', data: qp};
-        
+    if (qp) {
+        if (qp.has("fareq"))
+            app.irequest = { type: 'FA', data: qp };
+        else if (qp.has("emreq"))
+            app.irequest = { type: 'EM', data: qp };
+        else if (qp.has("loginreq"))
+            app.irequest = { type: 'LOG', data: qp };
+
         app.qp = qp;
     }
 
     //app.size = useBreakPoint(breakpoint, app);
     //console.log("APP-PROVIDER-BP", app.size);
-    if(token) {
+    if (token) {
         token.current = app;
     }
     const oninit = useRef(() => {
@@ -59,39 +59,49 @@ export const AppRoot = ({ init, onload, schema, onlogin, baseurl, control, child
 
         //VistaApp.icontainer.service.IPopup = PopupManager;
         //Prima di init e che avvenga prima chiamata api
-        if(!noErrorHandler){
+        if (!noErrorHandler) {
             VistaApp.icontainer.service.IApi.onManagedError = e => {
                 console.log("MANAGED ERROR", e);
                 VistaApp.control.openPopup(<div>{e.message}</div>, "ATTENZIONE");
             }
-            
+
             VistaApp.icontainer.service.IApi.onError = e => {
                 console.log("APIX ERROR", e);
-                if(e.type === "REQUEST")
+                if (e.type === "REQUEST")
                     VistaApp.control.openPopup(<div>Problema di comunicazione, controllare la connessione. Se il problema persiste riavviare l'applicazione.</div>, "ATTENZIONE");
-                else if(e.type === "RESPONSE")
-                    VistaApp.control.openPopup(<div>Si è verificato un problema, riprovare tra qualche istante. Se il problema persiste riavviare l'applicazione.</div>, "ATTENZIONE");
-                else if(e.type === "CALL")
-                    VistaApp.control.openPopup(<div>Si è verificato un problema tecnico. Si prega di riavviare l'applicazione.</div>, "ATTENZIONE");    
+                else if (e.type === "RESPONSE") {
+                    if (e.response.status === 401) {
+                        VistaApp.control.openPopup(<div>Sessione scaduta o permessi non sufficienti per visualizzare le informazione.</div>, "ATTENZIONE");
+                        setTimeout(() => {
+                            VistaApp.control.navigate("login");
+                        }, 3400);
+                    }
+                    else {
+                        VistaApp.control.openPopup(<div>Si è verificato un problema, riprovare tra qualche istante. Se il problema persiste riavviare l'applicazione.</div>, "ATTENZIONE");
+
+                    }
+                }
+                else if (e.type === "CALL")
+                    VistaApp.control.openPopup(<div>Si è verificato un problema tecnico. Si prega di riavviare l'applicazione.</div>, "ATTENZIONE");
             }
         }
-        
+
         if (baseurl) VistaApp.icontainer.service.IApi.channel.setBaseurl(baseurl);
         //axios.defaults.withCredentials = true;
         app.initialized = true;
-        if(onload) onload(app);
+        if (onload) onload(app);
     }
 
     useEffect(() => {
         VistaApp.current = app;
     }, [app]);
-    
+
     useEffect(() => {
-        oninit.current(); 
-        if(VistaApp.irequest && VistaApp.irequest.type === "LOG"){
+        oninit.current();
+        if (VistaApp.irequest && VistaApp.irequest.type === "LOG") {
             let session = localStorage.getItem("_session");
             console.log("SESSION-LOGIN", session);
-            if(session){
+            if (session) {
                 localStorage.removeItem("_session");
                 VistaApp.login(JSON.parse(session));
             }
@@ -100,7 +110,7 @@ export const AppRoot = ({ init, onload, schema, onlogin, baseurl, control, child
             VistaApp.onlogin(VistaApp);*/
     }, []);
 
-    
+
 
     return (
         <AppContext.Provider value={app} >
