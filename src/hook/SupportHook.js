@@ -150,15 +150,6 @@ export function ObservableForm(form, data, schema, formatter) {
     }
     return false;
   }
-  /*
-  try {
-    await form.validateFields();
-
-    // Validation is successful
-  } catch (errors) {
-    // Errors in the fields
-  }
-  */
 
   this.submitForm = async function (name) {
     const [isValid, source] = await this.validate(name);
@@ -168,7 +159,7 @@ export function ObservableForm(form, data, schema, formatter) {
   }
 
   this.resetForm = function (name) {
-    const form = this.target;//this.context.getForm(name);
+    const form = this.target;
     if (form) form.resetFields();
   }
 

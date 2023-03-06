@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { VistaApp, DataGraph } from '@essenza/core';
+import { VistaApp, DataGraph, DataSource } from '@essenza/core';
 
 export const useGlobal = (key, initialState)=>{
   const [state, setState] = useState(DataGraph.getGlobalState(key) || initialState);
@@ -47,8 +47,7 @@ export const useGraph = (model, path, initialData) => {
       source.node.observe(setSource);
       initialized.current = true;
     }
-    
-  //const { node, data } = source;
+
   useEffect(() => {
     console.log("TEST EFFECT MODEL IN useSource", source.node);
     //source.node.observe(setSource);
@@ -68,4 +67,14 @@ export const useGraph = (model, path, initialData) => {
   }, [source.node]);
 
   return source;
+}
+
+export function useNode(parent, name, defaultValue, predicate){
+
+}
+
+export function useSource(data, node){
+  const source = useRef(new DataSource(data, node));
+  source.current.data = data;
+  return source.current;
 }
