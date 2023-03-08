@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { VistaApp, DataGraph, Binding } from '@essenza/core';
 
-export const useGlobal = (key, initialState)=>{
+export const useGlobal = (key, initialState) => {
   const [state, setState] = useState(DataGraph.getGlobalState(key) || initialState);
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     console.log("EFFECT D-GLOBAL");
     DataGraph.registerGlobalState(key, state, setState);
     return () => DataGraph.unregisterGlobalState(key);
-  },[]);
+  }, []);
 
   return [state, setState];
 }
@@ -24,7 +24,7 @@ export const useGraph = (model, path, initialData) => {
     () => {
       const ic = VistaApp.icontainer;
       let sourcePath;
-      if(Object.prototype.toString.call(model) === "[object String]")
+      if (Object.prototype.toString.call(model) === "[object String]")
         sourcePath = model;
       else
         sourcePath = ic.ResolveClass(model).etype + "." + path;
@@ -37,19 +37,20 @@ export const useGraph = (model, path, initialData) => {
         node = DataGraph.setSource(sourcePath, initialData);
       }
       console.log("DATA-DEBUG useGraph SOURCE: ", sourcePath, node);
-      
+
       return node.datasource;
     });
 
-    const initialized = useRef(false)
+  const initialized = useRef(false)
 
-    if(!initialized.current){
-      source.node.observe(setSource);
-      initialized.current = true;
-    }
-    
-    const binding = useRef(new Binding());
-    source.binding = binding;
+  if (!initialized.current) {
+    source.node.observe(setSource);
+    initialized.current = true;
+  }
+
+  const binding = useRef(new Binding());
+  source.binding = binding;
+  source.bind();
 
   //const { node, data } = source;
   useEffect(() => {
@@ -58,14 +59,14 @@ export const useGraph = (model, path, initialData) => {
     return () => {
       console.log("UNOBSERVE", source.node);
       source.node.unobserve(setSource);
-      if(!source.node.permanent){
+      if (!source.node.permanent) {
         //NON DEVO CONTROLLARE CHE NON CI SIA NESSUN ALTRO OBSERVER PRIMA DI RESET SOURCE ???
         source.node.source = null;
         //NON DEVO FARE UNREGISTER DI GRAPH???
         //DataGraph.unregisterGraph(source.node.graph.getKey());
         console.log("UNOBSERVE-FREESOURCE", source.node.etype, source.node.name);
       }
-        
+
       //if(!permanent) node.setSource(null, null, false, true);
     } //TODO: model.strategy per ogni dataSource
   }, [source.node]);
