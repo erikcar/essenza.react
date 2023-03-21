@@ -178,7 +178,7 @@ export function ObservableForm(form, data, schema, formatter) {
     console.log("DEBUG FORM USE FORM MUTATE", values, node, this.contextid);
     for (const key in values) {
       if (Object.hasOwnProperty.call(values, key)) {
-        node.mutate(key, values[key], data);
+        this.source.mutate(key, values[key], data);
       }
     }
   }

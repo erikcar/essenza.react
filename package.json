@@ -1,6 +1,6 @@
 {
   "name": "@essenza/react",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "React Implementation of Vista Model",
   "module": "dist/vista.react.js",
   "types": "dist/vista.react.d.ts",
