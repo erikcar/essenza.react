@@ -10,9 +10,12 @@ import { useModel } from "../hook/SystemHook";
 function PopOverButtonModel(model){
     model.Subscribe("SELECTION", () => model.state.setVisible(false), null, null);
 }
+function controller(c){
+    c.skin = PopOverButton;
+}
 
 export function PopOverButton(info) {
-    const [model] = useModel();
+    const [model] = useModel(PopOverButton, controller);
     model.state = {};
     [model.state.visible, model.state.setVisible] = useState(false);
 

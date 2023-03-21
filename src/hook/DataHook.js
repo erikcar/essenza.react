@@ -49,7 +49,7 @@ export const useGraph = (model, path, initialData) => {
   }
 
   const binding = useRef(new Binding());
-  source.binding = binding;
+  source.binding = binding.current;
   source.bind();
 
   //const { node, data } = source;
