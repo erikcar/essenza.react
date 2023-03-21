@@ -169,7 +169,7 @@ export function ObservableForm(form, data, schema, formatter) {
    * @param {*} values 
    */
   this.mutateValues = function () {
-    const values = this.changedValues;
+    const values = this.changedValues; 
     if (!values)
       return;
 
