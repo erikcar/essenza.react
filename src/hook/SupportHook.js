@@ -108,6 +108,7 @@ export function ObservableForm(form, data, schema, formatter) {
     return await form.validateFields()
       .then(values => {
         console.log("DEBUG FORM VALIDATOR OK", name);
+        this.source.format(); //Formatto eventuale data TEMP (anche nel caso che nessun valore è mutato)
         this.mutateValues();
         this.checked = true;
         //form.resetFields();

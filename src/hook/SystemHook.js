@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { VistaContext } from "../components/Vista";
 import { useApp } from "../core/AppContext";
-import { Context, EntityModel, VistaApp } from "@essenza/core";
+import { Context, EntityModel, VistaApp, Controller } from "@essenza/core";
 
 /**
  * 
@@ -18,7 +18,7 @@ export function useControl(controller, ctx) { //Add useModelContext()
 
 export function useModel(skin, controller, vid, ctx){
     const model = useRef(new EntityModel(vid)).current;
-    const context = useContext(VistaContext) || ctx || VistaApp.context;
+    const context = ctx || useContext(VistaContext) || VistaApp.context;
 
     [model.state.__val, model.state.__refresh] = useState(false);
 
@@ -30,6 +30,11 @@ export function useModel(skin, controller, vid, ctx){
     model.control = context.controls.get(skin);
 
     if(!model.control){
+        if(!controller){
+            controller = new Controller();
+            controller.skin = skin;
+            controller.command = {};
+        }
         model.control = context.setController(skin, controller, true);
     }
 
@@ -37,12 +42,8 @@ export function useModel(skin, controller, vid, ctx){
 }
 
 export function useVista(skin, controller, contextName) {
-    //ContextName ?
-    const context = useRef(new Context(contextName || controller.name));
+    const context = useRef(new Context(contextName || skin.name || controller.name));
     const [m, c, s] = useModel(skin, controller, null, context.current); 
-    /*const [m] = useModel();
-    c.model = m;*/
-    console.log("USE VISTA:", c);
     return [context.current, m, c, s];
 }
 
