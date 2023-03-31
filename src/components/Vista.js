@@ -13,8 +13,8 @@ export function Vista({ children, context }) {
         throw new Error("Vista must define a unique id value");
 
     //const context = useRef(new Context(id));
-    useEffect(() => { const ctx = context; return () => ctx.dispose() }, [context])
-    console.log("VISTA", context);
+    //useEffect(() => { const ctx = context; return () => ctx.dispose() }, [context])
+    console.log("VISTA-DEBUG", context);
     return (
         <VistaContext.Provider value={context} >
             {children}

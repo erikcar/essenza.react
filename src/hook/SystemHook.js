@@ -42,9 +42,10 @@ export function useModel(skin, controller, vid, ctx){
 }
 
 export function useVista(skin, controller, contextName) {
-    const context = useRef(new Context(contextName || skin.name || controller.name));
-    const [m, c, s] = useModel(skin, controller, null, context.current); 
-    return [context.current, m, c, s];
+    const context = new Context(contextName || skin.name || controller.name);//useMemo(() => new Context(contextName || skin.name || controller.name), []); //useRef(new Context(contextName || skin.name || controller.name));
+    const [m, c, s] = useModel(skin, controller, null, context); 
+    useEffect(() => { const ctx = context; return () => ctx.dispose() }, [context])
+    return [context, m, c, s];
 }
 
 export function useBreakPoint(size){
